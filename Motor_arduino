@@ -1,0 +1,70 @@
+// Định nghĩa chân kết nối đến L298N
+const int IN1 = 7;
+const int IN2 = 6;
+const int IN3 = 5;
+const int IN4 = 4;
+
+void setup() {
+  // Thiết lập chân là OUTPUT
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+}
+
+// Hàm chạy thẳng
+void forward() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+
+// Hàm lùi
+void backward() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+}
+
+// Hàm rẽ trái
+void turnLeft() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+
+// Hàm rẽ phải
+void turnRight() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+}
+
+// Hàm dừng lại
+void stopMotors() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+}
+
+void loop() {
+  forward();      // Tiến tới
+  delay(2000);    // trong 2 giây
+
+  turnLeft();     // Quay trái
+  delay(1000);
+
+  backward();     // Lùi
+  delay(2000);
+
+  turnRight();    // Quay phải
+  delay(1000);
+
+  stopMotors();   // Dừng
+  delay(2000);
+}
