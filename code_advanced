@@ -1,0 +1,112 @@
+#include <SoftwareSerial.h>
+
+// Bluetooth module
+SoftwareSerial bluetooth(2, 3); // RX, TX
+
+// Motor pins
+const int IN1 = 7;
+const int IN2 = 6;
+const int IN3 = 5;
+const int IN4 = 4;
+
+// HC-SR04 pins
+const int trigPin = 8;
+const int echoPin = 9;
+
+// Khoảng cách tối thiểu để tránh vật
+const int safeDistance = 20;
+
+void setup() {
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+
+  Serial.begin(9600);         // Monitor
+  bluetooth.begin(9600);      // Bluetooth
+}
+
+// === Motor control functions ===
+void forward() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+
+void backward() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+}
+
+void turnLeft() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+
+void turnRight() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+}
+
+void stopMotors() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+}
+
+// === Đo khoảng cách bằng HC-SR04 ===
+long readDistance() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  long duration = pulseIn(echoPin, HIGH);
+  long distance = duration * 0.034 / 2;
+
+  return distance;
+}
+
+// === Chế độ tự động tránh vật ===
+void autoMode() {
+  long distance = readDistance();
+  if (distance > safeDistance) {
+    forward();
+  } else {
+    stopMotors();
+    delay(500);
+    backward();
+    delay(700);
+    turnRight();
+    delay(500);
+  }
+}
+
+void loop() {
+  if (bluetooth.available()) {
+    char command = bluetooth.read();
+    Serial.println(command);
+
+    switch (command) {
+      case 'F': forward(); break;
+      case 'B': backward(); break;
+      case 'L': turnLeft(); break;
+      case 'R': turnRight(); break;
+      case 'S': stopMotors(); break;
+      case 'A': autoMode(); break; // Kích hoạt chế độ tự động
+    }
+  }
+}
